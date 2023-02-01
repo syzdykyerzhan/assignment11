@@ -8,11 +8,24 @@
 import Foundation
 
 struct Constants{
+    static let api_key = "e0f9078e2a80c046997e4bd61c827765"
     struct Identifiers {
         static let categoryCollectionViewCell = "CategoryCollectionViewCell"
         static let categoriesTableViewCell = "CategoriesTableViewCell"
         static let movieCollectionViewCell = "MovieCollectionViewCell"
         static let cinemaTableViewCell = "CinemaTableViewCell"
+        static let allMovieCollectionViewCell = "AllMovieCollectionViewCell"
+    }
+    
+    struct Resources {
+        static let image_url: String = "https://image.tmdb.org/t/p/w500/"
+        
+        static let trending = "https://api.themoviedb.org/3/trending/all/day?api_key="
+        static let top_rated = "https://api.themoviedb.org/3/movie/top_rated?api_key="
+        static let popular = "https://api.themoviedb.org/3/movie/popular?api_key="
+        static let latest = "https://api.themoviedb.org/3/movie/latest?api_key="
+        
+        
     }
 }
 

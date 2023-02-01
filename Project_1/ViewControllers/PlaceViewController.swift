@@ -9,6 +9,9 @@ import UIKit
 
 final class PlaceViewController: UIViewController {
 
+    var myAPI = APICaller()
+    var movieList : [MovieModel] = []
+    
     private lazy var searchBar : UISearchBar = {
         let mysearchBar = UISearchBar()
         mysearchBar.layer.cornerRadius = 10
@@ -48,23 +51,40 @@ final class PlaceViewController: UIViewController {
         categoriCollectionView.delegate = self
         cinemaTableView.dataSource = self
         cinemaTableView.delegate = self
+        myAPI.delegate = self
+        
+        myAPI.fetchRequest()
         
         setupViews()
         setupConstraints()
     }
 }
 
+//MARK: APICaller Delegate
+
+extension PlaceViewController : APICallerDelegate{
+    func didUpdateMovieList(with movieList: [MovieModel]) {
+        self.movieList = movieList
+    }
+    
+    func didFailWithError(_ error: Error) {
+        print(error)
+    }
+    
+    
+}
+
 //MARK: Table View Datasource
 
 extension PlaceViewController: UITableViewDataSource{
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        listOfCinema.count
+        movieList.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: Constants.Identifiers.cinemaTableViewCell, for: indexPath) as! CinemaTableViewCell
-        let cinema = listOfCinema[indexPath.row]
-        cell.setInformation(image: cinema.imageOfCinema, title: cinema.title, inform: cinema.inform)
+        let movie = movieList[indexPath.row]
+        cell.setInformation(backdrop_path: movie.backdropPath, title: movie.originalTitle, inform: movie.overview)
         return cell
     }
 }

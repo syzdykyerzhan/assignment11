@@ -9,6 +9,10 @@ import UIKit
 import SnapKit
 
 final class MovieViewController: UIViewController {
+    
+    var myAPI = APICaller()
+    var movieList : [MovieModel] = []
+    
     private lazy var scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         return scrollView
@@ -41,8 +45,6 @@ final class MovieViewController: UIViewController {
         let myCollectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         myCollectionView.register(MovieCollectionViewCell.self, forCellWithReuseIdentifier: Constants.Identifiers.movieCollectionViewCell)
         myCollectionView.showsHorizontalScrollIndicator = false
-        
-        
         return myCollectionView
     }()
     
@@ -51,12 +53,9 @@ final class MovieViewController: UIViewController {
         myTableView.register(CategoriesTableViewCell.self, forCellReuseIdentifier: Constants.Identifiers.categoriesTableViewCell)
         myTableView.allowsSelection = false
         myTableView.isScrollEnabled = false
+        myTableView.separatorStyle = .none
         return myTableView
-        
-        
     }()
-    
-    
     
     private var selectedItemAt = 0
     
@@ -71,30 +70,62 @@ final class MovieViewController: UIViewController {
         movieCollectionView.delegate = self
         categoriesTableView.dataSource = self
         categoriesTableView.delegate = self
+        myAPI.delegate = self
+        
+        myAPI.fetchRequest()
         
         setupViews()
         setupConstraints()
+        
+        //print(movieList)
     }
 
+}
+
+//MARK: APICaller delegate
+
+extension MovieViewController: APICallerDelegate{
+    func didUpdateMovieList(with movieList: [MovieModel]) {
+        self.movieList = movieList
+    }
+    
+    func didFailWithError(_ error: Error) {
+        print("Found error \(error)")
+    }
+    
+    
 }
 
 //MARK: Table View Data Source
 
 extension MovieViewController: UITableViewDataSource{
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        4
+        1
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: Constants.Identifiers.categoriesTableViewCell, for: indexPath) as! CategoriesTableViewCell
+        cell.setMovies(listOfMovie: movieList)
+        //cell.backgroundColor = .systemBlue
         return cell
+    }
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        listOfCategories.count - 1
     }
 }
 
 //MARK: Table View Delegate
 extension MovieViewController: UITableViewDelegate{
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return CGFloat(400)
+        return CGFloat(tableView.frame.height / 4)
+    }
+    
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let headerView = HeaderView()
+        
+        headerView.setInformation(titleText: String(listOfCategories[section+1].rawValue.dropFirst()), allText: "Все 6")
+        return headerView
     }
 }
 
@@ -104,7 +135,7 @@ extension MovieViewController: UICollectionViewDataSource{
         if collectionView == categoriCollectionView{
             return listOfCategories.count
         }
-        return 5
+        return movieList.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -123,6 +154,7 @@ extension MovieViewController: UICollectionViewDataSource{
             return cell
         }
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constants.Identifiers.movieCollectionViewCell, for: indexPath) as! MovieCollectionViewCell
+        cell.setInformation(backdrop_path: movieList[indexPath.item].backdropPath)
         cell.layer.cornerRadius = 15
         cell.clipsToBounds = true
         
@@ -178,17 +210,17 @@ extension MovieViewController{
         categoriCollectionView.snp.makeConstraints { make in
             make.top.equalTo(searchBar.snp.bottom).offset(5)
             make.leading.trailing.equalToSuperview()
-            make.height.equalTo(view).multipliedBy(0.05)
+            make.height.equalTo(view).multipliedBy(0.07)
         }
         movieCollectionView.snp.makeConstraints { make in
             make.top.equalTo(categoriCollectionView.snp.bottom).offset(5)
             make.leading.trailing.equalToSuperview()
-            make.height.equalTo(view).multipliedBy(0.17)
+            make.height.equalTo(view).multipliedBy(0.2)
         }
         categoriesTableView.snp.makeConstraints { make in
             make.top.equalTo(movieCollectionView.snp.bottom).offset(5)
             make.leading.trailing.bottom.equalToSuperview()
-            make.height.equalTo(view).multipliedBy(1.7)
+            make.height.equalTo(view).multipliedBy(1.2)
         }
     }
 }

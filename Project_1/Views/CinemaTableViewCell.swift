@@ -37,10 +37,14 @@ class CinemaTableViewCell: UITableViewCell {
         return myLabel
     }()
     
-    public func setInformation(image: String, title: String, inform: String){
-        cinemaImage.image = UIImage(named: image)
+    public func setInformation(backdrop_path: String, title: String, inform: String){
         titleLabel.text = title
         informLabel.text = inform
+        
+        guard let url = URL(string: "\(Constants.Resources.image_url)\(backdrop_path)") else{fatalError("Incorrect image url")}
+        DispatchQueue.main.async {
+            self.cinemaImage.kf.setImage(with: url)
+        }
     }
     
     

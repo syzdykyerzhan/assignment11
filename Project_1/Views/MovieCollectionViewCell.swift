@@ -29,6 +29,13 @@ class MovieCollectionViewCell: UICollectionViewCell {
     public func setInformation(by name : String){
         imageView.image = UIImage(named: name)
     }
+    
+    public func setInformation(backdrop_path: String){
+        guard let url = URL(string: "\(Constants.Resources.image_url)\(backdrop_path)") else {fatalError("Incorrect link of iamge")}
+        DispatchQueue.main.async {
+            self.imageView.kf.setImage(with: url)
+        }
+    }
 }
 
 //MARK: setup views and constraints
